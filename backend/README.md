@@ -1,4 +1,4 @@
-# Oralyse Wipe — Backend (LOTS 1-2)
+# Oralyse Wipe — Backend (LOTS 1-3)
 
 Logiciel métier de traçabilité et de certification d'effacement sécurisé.
 
@@ -50,7 +50,32 @@ rapports produits par la station d'effacement (ShredOS + nwipe). Aucun accès
   `GET /api/v1/operations/{id}` (avec log brut),
   `GET /api/v1/supports/recherche?q=` (numéro de série, code interne, modèle).
 
-Non inclus (lots suivants) : certificats PDF, dashboard, frontend.
+## Périmètre livré (LOT 3) — certificats PDF signés + vérification QR
+
+- Modèle `certificats` + migration : UNIQUE sur `operation_id` (un certificat
+  par opération), token de vérification `secrets.token_urlsafe(32)`.
+- **Règle bloquante** (`certificat_service.verifier_eligibilite`) : certificat
+  généré UNIQUEMENT si `resultat = SUCCES` ET `verification_ok = 1`. ECHEC,
+  INTERROMPU, absence de vérification, vérification négative → refus explicite,
+  chacun couvert par un test dédié.
+- **Signature Ed25519** (`signature_service`) : clé privée hors dépôt git
+  (chemin `ORALYSE_CLE_PRIVEE_CHEMIN`, générée au premier usage, chmod 600),
+  clé publique exposée sur `GET /api/v1/certificats/cle-publique`. On signe le
+  SHA-256 des données certifiées (JSON canonique), pas le PDF : le PDF se
+  régénère, les données non.
+- **PDF** (`app/pdf/generator.py`, ReportLab — pur Python, pas de dépendance
+  système contrairement à WeasyPrint) : palette vert forêt `#1a3a2e` / cuivre
+  `#b87333`, toutes les données certifiées, QR code vectoriel, mention
+  obligatoire NIST SP 800-88 Rev. 1 en pied de page. Aucune mention
+  « juridiquement valide », nulle part.
+- **Page publique `GET /verif/{token}`** (sans authentification) : reconstruit
+  les données depuis la base, recalcule le hash et vérifie la signature Ed25519
+  À CHAQUE APPEL. Numéro de série partiellement masqué, aucune autre donnée.
+  Toute altération en base → certificat affiché INVALIDE.
+- Numérotation `CERT-2026-000001`, génération auditée, téléchargement
+  `GET /api/v1/certificats/{id}/pdf` (avec régénération du fichier si perdu).
+
+Non inclus (lots suivants) : dashboard, frontend.
 
 ## Architecture
 
@@ -92,10 +117,11 @@ cd backend
 uv run pytest --cov=app/services --cov-report=term
 ```
 
-76 tests (unitaires : chaînage d'audit, détection de rupture/suppression/réécriture,
-numérotation, service d'import — toutes les transitions de statut et tous les cas
-de rejet ; intégration : auth + rôles, CRUD complet, absence totale de suppression,
-upload de rapports, filtres, recherche). Couverture `services/` : 95 %.
+102 tests (unitaires : chaînage d'audit, détection de rupture/suppression/réécriture,
+numérotation, import — transitions et rejets, signature Ed25519, certificats —
+tous les cas de refus ; intégration : auth + rôles, CRUD complet, absence totale
+de suppression, upload de rapports, génération/téléchargement de certificats,
+page publique de vérification, altération → invalide). Couverture `services/` : 96 %.
 
 ## Notes de sécurité
 

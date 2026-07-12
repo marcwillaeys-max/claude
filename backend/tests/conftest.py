@@ -5,10 +5,11 @@ import tempfile
 from collections.abc import Iterator
 
 # Doit être défini AVANT tout import de l'application : le moteur global
-# est créé à l'import de app.database.
-os.environ.setdefault(
-    "ORALYSE_DATABASE_URL", f"sqlite:///{tempfile.mkdtemp()}/oralyse-test-global.db"
-)
+# est créé à l'import de app.database, et les settings sont mis en cache.
+_REPERTOIRE_TEST = tempfile.mkdtemp()
+os.environ.setdefault("ORALYSE_DATABASE_URL", f"sqlite:///{_REPERTOIRE_TEST}/oralyse-test-global.db")
+os.environ.setdefault("ORALYSE_CLE_PRIVEE_CHEMIN", f"{_REPERTOIRE_TEST}/cles/ed25519_prive.pem")
+os.environ.setdefault("ORALYSE_REPERTOIRE_CERTIFICATS", f"{_REPERTOIRE_TEST}/certificats")
 
 import pytest
 from fastapi.testclient import TestClient

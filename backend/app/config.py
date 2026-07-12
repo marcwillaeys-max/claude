@@ -25,6 +25,12 @@ class Settings(BaseSettings):
     admin_initial_mot_de_passe: str = "changez-moi"
     admin_initial_nom: str = "Administrateur initial"
 
+    # Certificats — la clé privée Ed25519 vit HORS du dépôt git (voir .gitignore).
+    cle_privee_chemin: str = "./cles/ed25519_prive.pem"
+    repertoire_certificats: str = "./certificats"
+    # Base des URL de vérification imprimées sur les certificats (QR + pied de page).
+    base_url_verification: str = "http://localhost:8000"
+
 
 @lru_cache
 def get_settings() -> Settings:

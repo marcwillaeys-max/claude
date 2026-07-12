@@ -10,7 +10,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from app.api.v1 import audit, auth, clients, lots, operations, supports
+from app.api.v1 import audit, auth, certificats, clients, lots, operations, supports, verification
 from app.config import get_settings
 from app.core.exceptions import (
     AuthentificationError,
@@ -62,6 +62,8 @@ def creer_application() -> FastAPI:
     app.include_router(lots.router)
     app.include_router(supports.router)
     app.include_router(operations.router)
+    app.include_router(certificats.router)
+    app.include_router(verification.router)
     app.include_router(audit.router)
 
     _STATUTS_HTTP: list[tuple[type[ErreurMetier], int]] = [

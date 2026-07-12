@@ -1,4 +1,4 @@
-# Oralyse Wipe — Backend (LOT 1)
+# Oralyse Wipe — Backend (LOTS 1-2)
 
 Logiciel métier de traçabilité et de certification d'effacement sécurisé.
 
@@ -26,7 +26,31 @@ rapports produits par la station d'effacement (ShredOS + nwipe). Aucun accès
   - les statuts `EFFACE_VERIFIE` / `EFFACE_NON_VERIFIE` ne peuvent pas être posés
     à la main : seul l'import d'un rapport station (LOT 2) en fera foi.
 
-Non inclus (lots suivants) : import des rapports, certificats PDF, dashboard, frontend.
+## Périmètre livré (LOT 2) — import des rapports station
+
+- Modèle `operations` + migration : chaque tentative d'effacement est conservée,
+  échecs compris — une opération ne se modifie jamais, c'est une preuve.
+- Contrat d'interface (`app/schemas/rapport.py`) : validation Pydantic **stricte**
+  du rapport station (spécification §4) — champ inconnu, champ manquant ou
+  `format_version` inattendue → rejet complet, jamais d'import partiel.
+- Service d'import (`app/services/import_service.py`) :
+  - rattachement au support par `code_interne` ; support inconnu → erreur
+    explicite, aucune création à l'aveugle ;
+  - intégrité : SHA-256(`log_brut`) recalculé et comparé à `log_sha256` — toute
+    divergence rejette le rapport ;
+  - transitions de statut strictes :
+    `SUCCES + verification.ok` → `EFFACE_VERIFIE` ·
+    `SUCCES` sans vérification → `EFFACE_NON_VERIFIE` ·
+    `ECHEC` / `INTERROMPU` / vérification négative → `ECHEC` ·
+    HPA ou DCO détecté → `NON_EFFACABLE` (prime sur tout) ;
+  - idempotent : même support + même hash de log = même opération, pas de doublon ;
+  - chaque import est journalisé dans l'audit chaîné.
+- Routes : `POST /api/v1/operations/import` (upload JSON), `GET /api/v1/operations`
+  (filtres lot / client / support / résultat / technicien / période),
+  `GET /api/v1/operations/{id}` (avec log brut),
+  `GET /api/v1/supports/recherche?q=` (numéro de série, code interne, modèle).
+
+Non inclus (lots suivants) : certificats PDF, dashboard, frontend.
 
 ## Architecture
 
@@ -68,9 +92,10 @@ cd backend
 uv run pytest --cov=app/services --cov-report=term
 ```
 
-47 tests (unitaires : chaînage d'audit, détection de rupture/suppression/réécriture,
-numérotation ; intégration : auth + rôles, CRUD complet, absence totale de
-suppression). Couverture `services/` : 93 %.
+76 tests (unitaires : chaînage d'audit, détection de rupture/suppression/réécriture,
+numérotation, service d'import — toutes les transitions de statut et tous les cas
+de rejet ; intégration : auth + rôles, CRUD complet, absence totale de suppression,
+upload de rapports, filtres, recherche). Couverture `services/` : 95 %.
 
 ## Notes de sécurité
 

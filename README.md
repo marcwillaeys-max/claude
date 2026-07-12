@@ -13,7 +13,7 @@ Deux systèmes strictement séparés :
 | Dossier | Contenu |
 |---------|---------|
 | `docs/specification.md` | Spécification complète + prompts des 5 lots |
-| `backend/` | LOT 1 livré : fondations, auth, CRUD, audit chaîné — voir `backend/README.md` |
+| `backend/` | LOTS 1-2 livrés : fondations, auth, CRUD, audit chaîné, import des rapports station — voir `backend/README.md` |
 
-Avancement : **LOT 1 terminé** · LOT 2 (import rapports) · LOT 3 (certificats PDF + QR) ·
+Avancement : **LOTS 1-2 terminés** · LOT 3 (certificats PDF + QR) ·
 LOT 4 (frontend React) · LOT 5 (scripts station) — à venir, un lot par session.

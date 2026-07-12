@@ -8,7 +8,7 @@ from __future__ import annotations
 import json
 from datetime import datetime, timezone
 
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
 from app.core.exceptions import IntrouvableError, ValidationMetierError
@@ -81,6 +81,23 @@ def lister(db: Session, lot_id: int | None = None, statut: str | None = None) ->
         requete = requete.where(Support.lot_id == lot_id)
     if statut is not None:
         requete = requete.where(Support.statut == statut)
+    return list(db.execute(requete).scalars().all())
+
+
+def rechercher(db: Session, q: str) -> list[Support]:
+    """Recherche dans numero_serie, code_interne et modele (sous-chaîne)."""
+    motif = f"%{q}%"
+    requete = (
+        select(Support)
+        .where(
+            or_(
+                Support.numero_serie.like(motif),
+                Support.code_interne.like(motif),
+                Support.modele.like(motif),
+            )
+        )
+        .order_by(Support.id)
+    )
     return list(db.execute(requete).scalars().all())
 
 

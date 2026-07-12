@@ -41,6 +41,16 @@ def lister_supports(
     return support_service.lister(db, lot_id=lot_id, statut=statut)
 
 
+# Déclarée avant /{support_id} : sinon « recherche » serait capté par le paramètre entier.
+@router.get("/recherche", response_model=list[SupportSortie])
+def rechercher_supports(
+    q: str,
+    db: Annotated[Session, Depends(get_db)],
+    _acteur: Annotated[Utilisateur, Depends(exiger_role("TECHNICIEN"))],
+) -> list[Support]:
+    return support_service.rechercher(db, q)
+
+
 @router.get("/{support_id}", response_model=SupportSortie)
 def obtenir_support(
     support_id: int,

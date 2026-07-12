@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Bases locales
+*.db
+*.sqlite3
+
+# Secrets — jamais dans le dépôt
+.env
+*.pem
+*.key
+
+# Node (lots suivants)
+node_modules/
+dist/

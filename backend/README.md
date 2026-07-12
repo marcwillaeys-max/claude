@@ -75,7 +75,17 @@ rapports produits par la station d'effacement (ShredOS + nwipe). Aucun accès
 - Numérotation `CERT-2026-000001`, génération auditée, téléchargement
   `GET /api/v1/certificats/{id}/pdf` (avec régénération du fichier si perdu).
 
-Non inclus (lots suivants) : dashboard, frontend.
+## Périmètre livré (LOT 4, partie backend) — dashboard
+
+- `GET /api/v1/dashboard` : agrégations 100 % SQL — supports effacés
+  (jour/7 j/30 j, uniquement si le statut final du support l'atteste), capacité
+  totale effacée, durée moyenne, taux de réussite, répartitions par technologie
+  et par statut.
+- `GET /api/v1/dashboard/a-traiter` : les supports `ECHEC` et `NON_EFFACABLE`.
+- Règle renforcée (spécification §1.6) : un support `ECHEC` ou `NON_EFFACABLE`
+  ne peut pas produire de certificat, même si un rapport annonce SUCCES.
+
+Le frontend (LOT 4) vit dans `../frontend/`.
 
 ## Architecture
 

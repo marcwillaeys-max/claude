@@ -105,6 +105,19 @@ def test_refus_verification_negative(db: Session, contexte: tuple[int, Support])
         certificat_service.generer(db, technicien_id, operation.id)
 
 
+def test_refus_support_non_effacable_malgre_succes(db: Session, contexte: tuple[int, Support]) -> None:
+    """HPA détecté : le support est NON_EFFACABLE même si le rapport annonce SUCCES.
+    Spécification §1.6 : jamais de certificat d'effacement pour ce support."""
+    technicien_id, support = contexte
+    rapport = construire_rapport(support.code_interne)
+    rapport["support"]["hpa_detecte"] = True
+    operation = import_service.importer_rapport(db, technicien_id, encoder(rapport)).operation
+    assert support.statut == "NON_EFFACABLE"
+    assert operation.resultat == "SUCCES" and operation.verification_ok == 1
+    with pytest.raises(ValidationMetierError, match="NON_EFFACABLE"):
+        certificat_service.generer(db, technicien_id, operation.id)
+
+
 def test_refus_operation_inexistante(db: Session, contexte: tuple[int, Support]) -> None:
     technicien_id, _ = contexte
     with pytest.raises(IntrouvableError):

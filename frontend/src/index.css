@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+@theme {
+  --color-foret: #1a3a2e;
+  --color-foret-clair: #2c5847;
+  --color-foret-pale: #e8f0ec;
+  --color-cuivre: #b87333;
+  --color-cuivre-clair: #d9a05f;
+  --color-creme: #f5f4f0;
+}
+
+body {
+  background-color: var(--color-creme);
+  color: #26302b;
+}

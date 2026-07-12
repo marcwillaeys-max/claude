@@ -101,7 +101,7 @@ def _hash_donnees(donnees: dict) -> str:
     return hashlib.sha256(canonique.encode("utf-8")).hexdigest()
 
 
-def verifier_eligibilite(operation: Operation) -> None:
+def verifier_eligibilite(operation: Operation, support: Support) -> None:
     """Lève ValidationMetierError si l'opération ne peut pas être certifiée."""
     if operation.resultat != "SUCCES":
         raise ValidationMetierError(
@@ -112,6 +112,13 @@ def verifier_eligibilite(operation: Operation) -> None:
         raise ValidationMetierError(
             "Certificat refusé : l'effacement n'a pas de vérification post-effacement positive. "
             "Un certificat atteste un résultat vérifié, pas une intention d'effacer."
+        )
+    # Spécification §1.6 : un support ECHEC ou NON_EFFACABLE (HPA/DCO non résolus)
+    # ne génère JAMAIS de certificat d'effacement, même si un rapport dit SUCCES.
+    if support.statut in ("ECHEC", "NON_EFFACABLE"):
+        raise ValidationMetierError(
+            f"Certificat refusé : le support {support.code_interne} est en statut {support.statut} "
+            "→ circuit destruction physique, pas de certificat d'effacement"
         )
 
 
@@ -128,9 +135,9 @@ def generer(db: Session, acteur_id: int, operation_id: int) -> Certificat:
             f"Un certificat existe déjà pour cette opération : {existant.numero_cert}"
         )
 
-    verifier_eligibilite(operation)
-
     ctx = _charger_contexte(db, operation)
+    verifier_eligibilite(operation, ctx.support)
+
     numero_cert = _prochain_numero(db)
     genere_le = _maintenant()
     token_verif = secrets.token_urlsafe(32)

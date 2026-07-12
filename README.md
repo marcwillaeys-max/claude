@@ -13,7 +13,7 @@ Deux systèmes strictement séparés :
 | Dossier | Contenu |
 |---------|---------|
 | `docs/specification.md` | Spécification complète + prompts des 5 lots |
-| `backend/` | LOTS 1-3 livrés : fondations, auth, CRUD, audit chaîné, import des rapports station, certificats PDF signés Ed25519 + vérification QR publique — voir `backend/README.md` |
+| `backend/` | LOTS 1-3 : fondations, auth, CRUD, audit chaîné, import des rapports station, certificats PDF signés Ed25519 + vérification QR publique, dashboard — voir `backend/README.md` |
+| `frontend/` | LOT 4 : React + TypeScript + Vite + Tailwind, 9 écrans — voir `frontend/README.md` |
 
-Avancement : **LOTS 1-3 terminés** ·
-LOT 4 (frontend React) · LOT 5 (scripts station) — à venir.
+Avancement : **LOTS 1-4 terminés** · LOT 5 (scripts station) — à venir.

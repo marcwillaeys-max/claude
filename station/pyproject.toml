@@ -1,0 +1,15 @@
+[project]
+name = "oralyse-wipe-station"
+version = "0.1.0"
+description = "Scripts de la station d'effacement Oralyse (ShredOS). Tournent en root sur la station dédiée."
+requires-python = ">=3.11"
+# AUCUNE dépendance runtime : la station utilise la bibliothèque standard et les
+# outils système (nwipe, hdparm, nvme-cli, smartctl). Rien à installer via pip
+# sur la machine cible, hors pytest pour les tests.
+
+[dependency-groups]
+dev = ["pytest>=8.2"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

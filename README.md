@@ -13,6 +13,7 @@ Deux systèmes strictement séparés :
 | Dossier | Contenu |
 |---------|---------|
 | `docs/specification.md` | Spécification complète + prompts des 5 lots |
+| `docs/procedure-effacement.md` | Procédure d'effacement (NIST SP 800-88, RGPD art. 28) — document destiné aux RSSI/DPO/auditeurs |
 | `backend/` | LOTS 1-3 : fondations, auth, CRUD, audit chaîné, import des rapports station, certificats PDF signés Ed25519 + vérification QR publique, dashboard — voir `backend/README.md` |
 | `frontend/` | LOT 4 : React + TypeScript + Vite + Tailwind, 9 écrans — voir `frontend/README.md` |
 | `station/` | LOT 5 : scripts ShredOS (root, hors réseau) — inventaire, triple sécurité, effacement, vérification, rapport — voir `station/README.md` |
